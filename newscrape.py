@@ -6,17 +6,26 @@
 
 import requests
 import urllib.request
-import time
 import re
 import os
+from tqdm import tqdm
 from bs4 import BeautifulSoup
+
+TGREEN = '\033[32m'
+TPURPLE = '\033[35m'
+TWHITE = '\033[37m'
+TYELLOW = '\033[33m'
 
 number_of_chapters = []
 volume_number = []
 
 num = 0
-bad_chars = 'volume'
+bad_chars = 'volume()'
+translate_quotations = '“”'
+replace_quotations = '""'
+
 table=str.maketrans('','',bad_chars)
+table2=str.maketrans(translate_quotations, replace_quotations)
 
 os.system('clear')
 
@@ -36,22 +45,34 @@ for value in number_of_chapters:
     if value != None:
         volume_number.append(value)
 
-number_of_chapters = len(volume_number)
+title = soup.find('h2', {'class' : 'book_title'}).get_text()
+chuu = soup.find('span', {'class' : 'total'})
+yuh = str(chuu)
 recent_volume = volume_number[0].translate(table)
 volume_number_int = int(recent_volume)
 
 os.system('clear')
-print('Fetching ' + str(number_of_chapters) + ' chapters..')
-print('Novel ID: ' + novel_ID)
+print('Extracting ' + TYELLOW + yuh[20:24].translate(table) + TWHITE + ' chapters')
+print('Novel: ' + TPURPLE + title + TWHITE)
+print('\n')
 
-while num < volume_number_int+1:
+for num in tqdm(range(volume_number_int)):
     num += 1
     link = 'https://novel.naver.com/best/detail.nhn?novelId=' + novel_ID + '&volumeNo=' + str(num)
     second_response = requests.get(link)
     soup2 = BeautifulSoup(second_response.text, 'html.parser')
     one_p_tag = soup2.findAll('p')[0].next
-    with open('webnovel'+ str(num) + '.txt', 'w') as text_file:
-        print(one_p_tag, file=text_file)
+    story_exists = soup2.find("div", {"class":"detail_view_content ft15"})
+    if story_exists != None:
+        with open(title + '' + str(num) + '.txt', 'w') as text_file:
+            chuu = re.sub(' +', ' ',str(one_p_tag))
+            print(chuu.translate(table2), file=text_file)
+    else:
+        continue
+        
+print('\n')
+print(TGREEN + 'Finished scraping ' + title + TWHITE)
 
-os.system('clear')
-print('Scraped ' + str(number_of_chapters) + ' chapters!')
+
+#result = soup.find("div", {"class":"detail_view_content ft15"})
+
