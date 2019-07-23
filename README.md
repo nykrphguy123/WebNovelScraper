@@ -1,4 +1,4 @@
-###Naver Web Novel Scraper
+###Naver Web Novel Scraper###
 
 I use this personally to get novels from https://novel.naver.com/best/popular.nhn 
 
