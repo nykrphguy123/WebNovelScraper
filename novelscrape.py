@@ -61,8 +61,8 @@ while first_page < last_page+1:
     link = 'https://novel.naver.com/best/list.nhn?novelId=' + novel_ID + '&page=' + str(first_page)
     response = requests.get(link)
     soup = BeautifulSoup(response.text, 'html.parser')
-    yuh = soup.find('ul', {'class' : 'list_type2 v3 league_num NE=a:lst'})
-    for a in yuh.findAll('a'):
+    chapter_numbers = soup.find('ul', {'class' : 'list_type2 v3 league_num NE=a:lst'})
+    for a in chapter_numbers.findAll('a'):
         volume_number.append(a.get('href'))
     first_page = first_page + 1
 
